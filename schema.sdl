@@ -1,7 +1,22 @@
+type Query {
+  getVotingResults(nextToken: String): VotingResults
+}
+
 type Mutation {
-  vote(service: String): Int
+  vote(service: String!): Int
 }
 
 schema {
+  query: Query
   mutation: Mutation
+}
+
+type VotingResults {
+  results: [VotingResult]
+  nextToken: String
+}
+
+type VotingResult {
+  service: String!
+  upvotes: Int!
 }
