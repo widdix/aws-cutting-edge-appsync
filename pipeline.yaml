@@ -15,6 +15,12 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: 'AWS::S3::Bucket'
+  FrontendBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: 'aws-cutting-edge-arch'
+      WebsiteConfiguration:
+        IndexDocument: index.html
   CodeBuildLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
@@ -273,3 +279,15 @@ Resources:
           OutputArtifacts:
           - Name: Frontend
           RunOrder: 1
+        - Name: Publish
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Provider: S3
+            Version: '1'
+          Configuration:
+            BucketName: !Ref FrontendBucket
+            Extract: true
+          InputArtifacts:
+          - Name: Frontend
+          RunOrder: 2
