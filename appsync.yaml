@@ -1,0 +1,102 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Cutting-Edge Architecture: AppSync + Lambda + DynamoDB'
+Parameters:
+  EnviromentPrefix:
+    Type: String
+    Default: ''
+Resources:
+  GraphQLApiRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'appsync.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ServiceRole
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'logs:CreateLogGroup'
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+            Resource: '*'
+  GraphQLApi:
+    Type: 'AWS::AppSync::GraphQLApi'
+    Properties:
+      Name: !Sub '${EnviromentPrefix}-api'
+      AuthenticationType: API_KEY
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt 'GraphQLApiRole.Arn'
+        FieldLogLevel: ALL
+  GraphQLSchema:
+    Type: 'AWS::AppSync::GraphQLSchema'
+    Properties:
+      DefinitionS3Location: './schema.sdl'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+  VoteTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: service
+        AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+      - AttributeName: service
+        KeyType: HASH
+  VoteRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'appsync.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ServiceRole
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'dynamodb:DeleteItem'
+            - 'dynamodb:GetItem'
+            - 'dynamodb:PutItem'
+            - 'dynamodb:Query'
+            - 'dynamodb:Scan'
+            - 'dynamodb:UpdateItem'
+            Resource:
+            - !GetAtt VoteTable.Arn
+            - !Sub '${VoteTable.Arn}/*'
+  VoteDataSource:
+    Type: 'AWS::AppSync::DataSource'
+    Properties:
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt 'VoteRole.Arn'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+      Name: vote
+      DynamoDBConfig:
+        TableName: !Ref VoteTable
+        AwsRegion: !Ref 'AWS::Region'
+  VoteResolver:
+    Type: 'AWS::AppSync::Resolver'
+    Properties:
+      TypeName: Mutation
+      DataSourceName: !GetAtt 'VoteDataSource.Name'
+      RequestMappingTemplateS3Location: './vote-request.vtl'
+      ResponseMappingTemplateS3Location: './vote-response.vtl'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+      FieldName: vote
+Outputs:
+  GraphQLUrl:
+    Value: !GetAtt 'GraphQLApi.GraphQLUrl'
+  ApiId:
+    Value: !GetAtt 'GraphQLApi.ApiId'

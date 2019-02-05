@@ -1,0 +1,9 @@
+type Mutation {
+
+  vote(services: [String]): Boolean
+
+}
+
+schema {
+  mutation: Mutation
+}

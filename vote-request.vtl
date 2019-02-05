@@ -1,0 +1,12 @@
+{
+  "version" : "2017-02-28",
+  "operation" : "PutItem",
+  "key" : {
+    "sub": {"S": "${context.identity.sub}"}
+  },
+  "attributeValues" : {
+    "endpoint": {"S" : "${context.arguments.endpoint}"},
+    "key_p256dh": {"S" : "${context.arguments.keys.p256dh}"},
+    "key_auth": {"S" : "${context.arguments.keys.auth}"}
+  }
+}
