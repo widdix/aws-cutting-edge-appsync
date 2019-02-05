@@ -35,6 +35,11 @@ Resources:
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt 'GraphQLApiRole.Arn'
         FieldLogLevel: ALL
+  ApiKey:
+    Type: 'AWS::AppSync::ApiKey'
+    Properties:
+      Expires: 31536000
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
   GraphQLSchema:
     Type: 'AWS::AppSync::GraphQLSchema'
     Properties:
@@ -100,3 +105,5 @@ Outputs:
     Value: !GetAtt 'GraphQLApi.GraphQLUrl'
   ApiId:
     Value: !GetAtt 'GraphQLApi.ApiId'
+  ApiKey:
+    Value: !GetAtt 'ApiKey.ApiKey'
