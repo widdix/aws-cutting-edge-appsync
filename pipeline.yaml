@@ -6,8 +6,6 @@ Parameters:
     Type: String
   GithubRepo:
     Type: String
-  GithubBranch:
-    Type: String
   GithubOAuthToken:
     Type: String
     NoEcho: true
@@ -15,8 +13,22 @@ Parameters:
     Type: String
     Default: ''
 Resources:
-  ArtifactsBucket:
+  ArtifactStore:
     Type: 'AWS::S3::Bucket'
+  CloudFormationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'cloudformation.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AdministratorAccess'
   PipelineRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -36,7 +48,7 @@ Resources:
     Properties:
       ArtifactStore:
         Type: S3
-        Location: !Ref ArtifactsBucket
+        Location: !Ref ArtifactStore
       Name: !Ref 'AWS::StackName'
       RestartExecutionOnUpdate: true
       RoleArn: !GetAtt 'PipelineRole.Arn'
@@ -52,8 +64,26 @@ Resources:
           Configuration:
             Owner: !Ref GithubOwner
             Repo: !Ref GithubRepo
-            Branch: !Ref GithubBranch
+            Branch: 'master'
             OAuthToken: !Ref GithubOAuthToken
           OutputArtifacts:
+          - Name: Source
+          RunOrder: 1
+      - Name: Pipeline
+        Actions:
+        - Name: DeployPipeline
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Provider: CloudFormation
+            Version: 1
+          Configuration:
+            ActionMode: CREATE_UPDATE
+            Capabilities: CAPABILITY_IAM
+            RoleArn: !GetAtt 'CloudFormationRole.Arn'
+            StackName: !Ref 'AWS::StackName'
+            TemplatePath: 'Source::deploy/deployment-pipeline.yml'
+            ParameterOverrides: !Sub '{"GithubOwner": "${GithubOwner}", "GithubRepo": "${GithubRepo}", "GithubOAuthToken": "${GithubOAuthToken}", "EnviromentSuffix": "${EnviromentSuffix}"}'
+          InputArtifacts:
           - Name: Source
           RunOrder: 1
