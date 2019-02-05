@@ -1,12 +1,16 @@
 {
   "version" : "2017-02-28",
-  "operation" : "PutItem",
+  "operation" : "UpdateItem",
   "key" : {
-    "sub": {"S": "${context.identity.sub}"}
+    "service": {"S" : "${context.arguments.service}"}
   },
-  "attributeValues" : {
-    "endpoint": {"S" : "${context.arguments.endpoint}"},
-    "key_p256dh": {"S" : "${context.arguments.keys.p256dh}"},
-    "key_auth": {"S" : "${context.arguments.keys.auth}"}
+  "update" : {
+      "expression" : "ADD #upvotes :plusOne",
+      "expressionNames" : {
+          "#upvotes" : "upvotes"
+      },
+      "expressionValues" : {
+          ":plusOne" : { "N" : 1 }
+      }
   }
 }

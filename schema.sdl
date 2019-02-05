@@ -1,6 +1,6 @@
 type Mutation {
 
-  vote(services: [String]): Boolean
+  vote(service: String): Integer
 
 }
 
