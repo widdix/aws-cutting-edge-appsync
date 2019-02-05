@@ -178,7 +178,7 @@ Resources:
           artifacts:
             files:
             - '**/*'
-            base-directory: 'frontend/dist'
+            base-directory: 'frontend/dist/'
       TimeoutInMinutes: 10
   Pipeline:
     Type: 'AWS::CodePipeline::Pipeline'
