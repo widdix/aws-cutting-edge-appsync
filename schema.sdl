@@ -3,7 +3,7 @@ type Query {
 }
 
 type Mutation {
-  vote(service: String!): Int
+  vote(service: String!): Boolean
 }
 
 schema {
