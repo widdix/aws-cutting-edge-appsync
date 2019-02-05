@@ -82,7 +82,7 @@ Resources:
             Capabilities: CAPABILITY_IAM
             RoleArn: !GetAtt 'CloudFormationRole.Arn'
             StackName: !Ref 'AWS::StackName'
-            TemplatePath: 'Source::pipeline.yml'
+            TemplatePath: 'Source::pipeline.yaml'
             ParameterOverrides: !Sub '{"GithubOwner": "${GithubOwner}", "GithubRepo": "${GithubRepo}", "GithubOAuthToken": "${GithubOAuthToken}", "EnviromentSuffix": "${EnviromentSuffix}"}'
           InputArtifacts:
           - Name: Source
