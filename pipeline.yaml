@@ -86,7 +86,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: 'BUILD_GENERAL1_SMALL'
-        Image: 'aws/codebuild/ubuntu-base:14.04'
+        Image: 'amazonlinux:2.0.20181114'
         Type: 'LINUX_CONTAINER'
       LogsConfig:
         CloudWatchLogs:
@@ -99,6 +99,10 @@ Resources:
         BuildSpec: !Sub |
           version: 0.2
           phases:
+            install:
+              commands:
+              - 'yum -y install python2-pip'
+              - 'pip install awscli==1.16.90'
             build:
               commands:
               - 'aws cloudformation package --template-file appsync.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
