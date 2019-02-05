@@ -74,17 +74,13 @@ Resources:
             - 'logs:CreateLogStream'
             - 'logs:PutLogEvents'
             Resource: !GetAtt 'CodeBuildLogGroup.Arn'
-          - Sid: CodeCommitPolicy
-            Effect: Allow
-            Action: 'codecommit:GitPull'
-            Resource: '*'
           - Sid: S3Policy
             Effect: Allow
             Action:
             - 's3:GetObject'
             - 's3:GetObjectVersion'
             - 's3:PutObject'
-            Resource: '*'
+            Resource: !Sub '{ArtifactStore.Arn}/*'
   PackageProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -137,17 +133,13 @@ Resources:
             - 'logs:CreateLogStream'
             - 'logs:PutLogEvents'
             Resource: !GetAtt 'CodeBuildLogGroup.Arn'
-          - Sid: CodeCommitPolicy
-            Effect: Allow
-            Action: 'codecommit:GitPull'
-            Resource: '*'
           - Sid: S3Policy
             Effect: Allow
             Action:
             - 's3:GetObject'
             - 's3:GetObjectVersion'
             - 's3:PutObject'
-            Resource: '*'
+            Resource: !Sub '{ArtifactStore.Arn}/*'
   BuildFrontendProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -171,7 +163,7 @@ Resources:
             build:
               commands:
               - 'cd frontend'
-              - 'npm ci'
+              - 'npm install'
           artifacts:
             files:
             - '**/*'
