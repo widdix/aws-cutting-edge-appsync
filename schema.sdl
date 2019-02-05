@@ -1,5 +1,6 @@
 type Query {
   getVotingResults(nextToken: String): VotingResults
+   getServices(nextToken: String): Services
 }
 
 type Mutation {
@@ -9,6 +10,11 @@ type Mutation {
 schema {
   query: Query
   mutation: Mutation
+}
+
+type Services {
+  items: [String]
+  nextToken: String
 }
 
 type VotingResults {

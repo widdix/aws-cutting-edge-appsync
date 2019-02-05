@@ -81,6 +81,57 @@ Resources:
             Resource:
             - !GetAtt VoteTable.Arn
             - !Sub '${VoteTable.Arn}/*'
+  ServicesRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'appsync.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ServiceRole
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: 'lambda:InvokeFunction'
+            Resource: !GetAtt ServicesFunction.Arn
+  ServicesFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'lambda.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: lambda
+        PolicyDocument:
+          Statement:
+            Effect: 'Allow'
+            Action:
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+            Resource: '*'
+  ServicesFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: 'index.handler'
+      Runtime: 'nodejs8.10'
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt 'ServicesFunctionRole.Arn'
+      Code:
+        ZipFile: |
+          'use strict';
+          exports.handler = async (event, context) => {
+            return {items: ["ec2", "elb", "lambda", "appsync", "apigateway", "fargate", "alb"]};
+          };
   VoteDataSource:
     Type: 'AWS::AppSync::DataSource'
     Properties:
@@ -91,6 +142,15 @@ Resources:
       DynamoDBConfig:
         TableName: !Ref VoteTable
         AwsRegion: !Ref 'AWS::Region'
+  ServicesDataSource:
+    Type: 'AWS::AppSync::DataSource'
+    Properties:
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt 'ServicesRole.Arn'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+      Name: service
+      LambdaConfig:
+        LambdaFunctionArn: !GetAtt ServicesFunction.Arn
   VoteResolver:
     Type: 'AWS::AppSync::Resolver'
     Properties:
@@ -109,6 +169,15 @@ Resources:
       ResponseMappingTemplateS3Location: './getVotingResults-response.vtl'
       ApiId: !GetAtt 'GraphQLApi.ApiId'
       FieldName: getVotingResults
+  ServicesResolver:
+    Type: 'AWS::AppSync::Resolver'
+    Properties:
+      TypeName: Query
+      DataSourceName: !GetAtt 'ServicesDataSource.Name'
+      RequestMappingTemplateS3Location: './getServices-request.vtl'
+      ResponseMappingTemplateS3Location: './getServices-response.vtl'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+      FieldName: getServices
 Outputs:
   GraphQLUrl:
     Value: !GetAtt 'GraphQLApi.GraphQLUrl'
