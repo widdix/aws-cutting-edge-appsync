@@ -101,7 +101,7 @@ Resources:
           phases:
             build:
               commands:
-              - 'aws cloudformation package --template-file graphql.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
+              - 'aws cloudformation package --template-file appsync.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
           artifacts:
             files:
             - 'output.yaml'
