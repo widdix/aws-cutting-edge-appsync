@@ -1,7 +1,5 @@
 type Mutation {
-
   vote(service: String): Integer
-
 }
 
 schema {

@@ -15,6 +15,10 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: 'AWS::S3::Bucket'
+  CodeBuildLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 14
   CloudFormationRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -43,6 +47,65 @@ Resources:
           - 'sts:AssumeRole'
       ManagedPolicyArns:
       - 'arn:aws:iam::aws:policy/AdministratorAccess'
+  PackageCodeBuildRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'codebuild.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ServiceRole # CodeBuild needs a set of access rights defined in https://docs.aws.amazon.com/codebuild/latest/userguide/setting-up.html#setting-up-service-role
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Sid: CloudWatchLogsPolicy
+            Effect: Allow
+            Action:
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+            Resource: !GetAtt 'CodeBuildLogGroup.Arn'
+          - Sid: CodeCommitPolicy
+            Effect: Allow
+            Action: 'codecommit:GitPull'
+            Resource: '*'
+          - Sid: S3Policy
+            Effect: Allow
+            Action:
+            - 's3:GetObject'
+            - 's3:GetObjectVersion'
+            - 's3:PutObject'
+            Resource: '*'
+  PackageProject:
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: 'BUILD_GENERAL1_SMALL'
+        Image: 'aws/codebuild/ubuntu-base:14.04'
+        Type: 'LINUX_CONTAINER'
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Ref CodeBuildLogGroup
+          StreamName: 'cfn-package'
+      ServiceRole: !GetAtt 'PackageCodeBuildRole.Arn'
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub |
+          version: 0.2
+          phases:
+            build:
+              commands:
+              - 'aws cloudformation package --template-file graphql.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
+          artifacts:
+            files:
+            - 'output.yaml'
+      TimeoutInMinutes: 10
   Pipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
@@ -83,7 +146,50 @@ Resources:
             RoleArn: !GetAtt 'CloudFormationRole.Arn'
             StackName: !Ref 'AWS::StackName'
             TemplatePath: 'Source::pipeline.yaml'
-            ParameterOverrides: !Sub '{"GithubOwner": "${GithubOwner}", "GithubRepo": "${GithubRepo}", "GithubOAuthToken": "${GithubOAuthToken}", "EnviromentPrefix": "${EnviromentPrefix}"}'
+            ParameterOverrides: !Sub |
+              {
+                "GithubOwner": "${GithubOwner}", 
+                "GithubRepo": "${GithubRepo}", 
+                "GithubOAuthToken": "${GithubOAuthToken}", 
+                "EnviromentPrefix": "${EnviromentPrefix}"
+              }
           InputArtifacts:
           - Name: Source
           RunOrder: 1
+      - Name: AppSync
+        Actions:
+        - Name: Package
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Provider: CodeBuild
+            Version: '1'
+          Configuration:
+            ProjectName: !Ref PackageProject
+          InputArtifacts:
+          - Name: Source
+          OutputArtifacts:
+          - Name: Package
+          RunOrder: 1
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Provider: CloudFormation
+            Version: '1'
+          Configuration:
+            ActionMode: CREATE_UPDATE
+            Capabilities: CAPABILITY_IAM
+            RoleArn: !GetAtt 'CloudFormationRole.Arn'
+            StackName: !Sub '${EnviromentPrefix}-appsync'
+            TemplatePath: 'Package::output.yaml'
+            ParameterOverrides: !Sub |
+              {
+                "EnviromentPrefix": "${EnviromentPrefix}"
+              }
+            OutputFileName: 'output.json'
+          InputArtifacts:
+          - Name: Package
+          OutputArtifacts:
+          - Name: AppSync
+          RunOrder: 2
