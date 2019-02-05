@@ -1,0 +1,19 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Cutting-Edge Architecture: Deployment Pipeline, a cloudonaut.io project'
+Parameters:
+  GithubOwner:
+    Type: String
+  GithubRepo:
+    Type: String
+  GithubBranch:
+    Type: String
+  GithubOAuthToken:
+    Type: String
+    NoEcho: true
+  EnviromentSuffix:
+    Type: String
+    Default: ''
+Resources:
+  ArtifactsBucket:
+    Type: 'AWS::S3::Bucket'
