@@ -12,7 +12,7 @@ schema {
 }
 
 type VotingResults {
-  results: [VotingResult]
+  items: [VotingResult]
   nextToken: String
 }
 

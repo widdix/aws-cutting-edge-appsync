@@ -100,6 +100,15 @@ Resources:
       ResponseMappingTemplateS3Location: './vote-response.vtl'
       ApiId: !GetAtt 'GraphQLApi.ApiId'
       FieldName: vote
+  VotingResultsResolver:
+    Type: 'AWS::AppSync::Resolver'
+    Properties:
+      TypeName: Query
+      DataSourceName: !GetAtt 'VoteDataSource.Name'
+      RequestMappingTemplateS3Location: './getVotingResults-request.vtl'
+      ResponseMappingTemplateS3Location: './getVotingResults-response.vtl'
+      ApiId: !GetAtt 'GraphQLApi.ApiId'
+      FieldName: getVotingResults
 Outputs:
   GraphQLUrl:
     Value: !GetAtt 'GraphQLApi.GraphQLUrl'
