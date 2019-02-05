@@ -17,3 +17,43 @@ Parameters:
 Resources:
   ArtifactsBucket:
     Type: 'AWS::S3::Bucket'
+  PipelineRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'codepipeline.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AdministratorAccess'
+  Pipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactsBucket
+      Name: !Ref 'AWS::StackName'
+      RestartExecutionOnUpdate: true
+      RoleArn: !GetAtt 'PipelineRole.Arn'
+      Stages:
+      - Name: Source
+        Actions:
+        - Name: FetchSource
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Provider: GitHub
+            Version: 1
+          Configuration:
+            Owner: !Ref GithubOwner
+            Repo: !Ref GithubRepo
+            Branch: !Ref GithubBranch
+            OAuthToken: !Ref GithubOAuthToken
+          OutputArtifacts:
+          - Name: Source
+          RunOrder: 1
