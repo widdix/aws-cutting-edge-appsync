@@ -21,6 +21,16 @@ Resources:
       BucketName: 'aws-cutting-edge-arch'
       WebsiteConfiguration:
         IndexDocument: index.html
+  S3BucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+        - Action: 's3:GetObject'
+          Effect: Allow
+          Resource: !Sub 'arn:aws:s3:::${FrontendBucket}/*'
+          Principal: '*'
   CodeBuildLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
