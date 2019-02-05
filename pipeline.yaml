@@ -173,7 +173,7 @@ Resources:
             build:
               commands:
               - 'cd frontend'
-              - 'npm install --production'
+              - 'npm install'
               - 'npm run-script build'
               - 'ls'
           artifacts:
