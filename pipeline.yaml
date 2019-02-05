@@ -164,6 +164,7 @@ Resources:
               commands:
               - 'cd frontend'
               - 'npm install'
+              - 'npm build'
           artifacts:
             files:
             - '**/*'
