@@ -9,6 +9,9 @@ Parameters:
   GithubOAuthToken:
     Type: String
     NoEcho: true
+  GithubSecret:
+    Type: String
+    NoEcho: true
   EnviromentPrefix:
     Type: String
     Default: ''
@@ -181,6 +184,19 @@ Resources:
             - '**/*'
             base-directory: 'frontend/dist/'
       TimeoutInMinutes: 10
+  Webhook:
+    Type: 'AWS::CodePipeline::Webhook'
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: !Ref GithubSecret
+      Filters:
+      - JsonPath: "$.ref"
+        MatchEquals: refs/heads/{Branch}
+      TargetPipeline: !Ref Pipeline
+      TargetAction: FetchSource
+      TargetPipelineVersion: !GetAtt Pipeline.Version
+      RegisterWithThirdParty: true
   Pipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
@@ -227,6 +243,7 @@ Resources:
                 "GithubOwner": "${GithubOwner}", 
                 "GithubRepo": "${GithubRepo}", 
                 "GithubOAuthToken": "${GithubOAuthToken}", 
+                "GithubSecret": "${GithubSecret}", 
                 "EnviromentPrefix": "${EnviromentPrefix}"
               }
           InputArtifacts:
