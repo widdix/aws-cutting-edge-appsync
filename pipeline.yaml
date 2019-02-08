@@ -204,6 +204,7 @@ Resources:
             Repo: !Ref GithubRepo
             Branch: 'master'
             OAuthToken: !Ref GithubOAuthToken
+            PollForSourceChanges: false
           OutputArtifacts:
           - Name: Source
           RunOrder: 1
