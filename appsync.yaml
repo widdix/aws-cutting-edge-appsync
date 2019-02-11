@@ -137,7 +137,7 @@ Resources:
                 "fargate",
                 "clb",
                 "nlb",
-                "alb"
+                "alb",
                 "appsync",
                 "apigateway",
                 "eks",
