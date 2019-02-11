@@ -23,25 +23,26 @@ const authLink = setContext((_, { headers }) => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    query: {
+      fetchPolicy: 'no-cache'
+    }
+  }
 });
 
 var votingresults = new Vue({
   el: '#votingresults',
   data () {
     return {
-      loading: false,
-      items: null,
-      error: null
+      items: []
     }
   },
   created () {
-    this.fetchData()
+    this.fetchData();
   },
   methods: {
     fetchData () {
-      this.error = this.items = null
-      this.loading = true
       client
         .query({
           query: gql`
@@ -57,12 +58,11 @@ var votingresults = new Vue({
           `
         })
         .then(result => {
-          this.loading = false;
-          this.items = result.data.getVotingResults.items;
+          console.log(result);
+          this.items = result.data.getVotingResults.items.values();
         })
         .catch(err => {
-          this.loading = false;
-          this.error = err;
+          console.log(err);
         });
     }
   }
@@ -72,9 +72,7 @@ var vote = new Vue({
   el: '#vote',
   data () {
     return {
-      loading: false,
       items: null,
-      error: null,
       service: null
     }
   },
@@ -93,6 +91,7 @@ var vote = new Vue({
         })
         .then(result => {
           console.log(result);
+          votingresults.fetchData();
         })
         .catch(err => {
           console.log(err);
@@ -113,12 +112,11 @@ var vote = new Vue({
           `
         })
         .then(result => {
-          this.loading = false;
           this.items = result.data.getServices.items;
+          this.service = 'ec2'
         })
         .catch(err => {
-          this.loading = false;
-          this.error = err;
+          console.log(err);
         });
     }
   }
