@@ -59,7 +59,8 @@ var votingresults = new Vue({
         })
         .then(result => {
           console.log(result);
-          this.items = result.data.getVotingResults.items.values();
+          result.data.getVotingResults.items.sort((a, b) => b.upvotes - a.upvotes)
+          this.items = result.data.getVotingResults.items;
         })
         .catch(err => {
           console.log(err);
@@ -98,8 +99,6 @@ var vote = new Vue({
         });
     },
     fetchData () {
-      this.error = this.items = null
-      this.loading = true
       client
         .query({
           query: gql`
@@ -112,8 +111,9 @@ var vote = new Vue({
           `
         })
         .then(result => {
-          this.items = result.data.getServices.items;
-          this.service = 'ec2'
+          console.log(result.data.getServices.items);
+          this.items = result.data.getServices.items.sort();
+          this.service = result.data.getServices.items[0];
         })
         .catch(err => {
           console.log(err);

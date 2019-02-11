@@ -130,7 +130,27 @@ Resources:
         ZipFile: |
           'use strict';
           exports.handler = async (event, context) => {
-            return {items: ["ec2", "elb", "lambda", "appsync", "apigateway", "fargate", "alb"]};
+            return {
+              items: [
+                "ec2",
+                "lambda",
+                "fargate",
+                "clb",
+                "nlb",
+                "alb"
+                "appsync",
+                "apigateway",
+                "eks",
+                "ecs",
+                "rds-aurora",
+                "rds-postgres",
+                "rds-mysql",
+                "rds-mariadb",
+                "dynamodb",
+                "s3",
+                "efs",
+                "ebs"
+              ]};
           };
   VoteDataSource:
     Type: 'AWS::AppSync::DataSource'
