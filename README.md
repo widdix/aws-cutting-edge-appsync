@@ -1,1 +1,1 @@
-# aws-cutting-edge-arch
+# aws-cutting-edge-appsync

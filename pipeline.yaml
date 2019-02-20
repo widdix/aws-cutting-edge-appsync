@@ -249,9 +249,9 @@ Resources:
           InputArtifacts:
           - Name: Source
           RunOrder: 1
-      - Name: AppSync
+      - Name: Commit
         Actions:
-        - Name: Package
+        - Name: PackageBackend
           ActionTypeId:
             Category: Build
             Owner: AWS
@@ -262,33 +262,9 @@ Resources:
           InputArtifacts:
           - Name: Source
           OutputArtifacts:
-          - Name: Package
+          - Name: Backend
           RunOrder: 1
-        - Name: Deploy
-          ActionTypeId:
-            Category: Deploy
-            Owner: AWS
-            Provider: CloudFormation
-            Version: '1'
-          Configuration:
-            ActionMode: CREATE_UPDATE
-            Capabilities: CAPABILITY_IAM
-            RoleArn: !GetAtt 'CloudFormationRole.Arn'
-            StackName: !Sub '${EnviromentPrefix}-appsync'
-            TemplatePath: 'Package::output.yaml'
-            ParameterOverrides: !Sub |
-              {
-                "EnviromentPrefix": "${EnviromentPrefix}"
-              }
-            OutputFileName: 'output.json'
-          InputArtifacts:
-          - Name: Package
-          OutputArtifacts:
-          - Name: AppSync
-          RunOrder: 2
-      - Name: Frontend
-        Actions:
-        - Name: Package
+        - Name: PackageFrontend
           ActionTypeId:
             Category: Build
             Owner: AWS
@@ -301,7 +277,31 @@ Resources:
           OutputArtifacts:
           - Name: Frontend
           RunOrder: 1
-        - Name: Publish
+      - Name: Production
+        Actions:
+        - Name: DeployBackend
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Provider: CloudFormation
+            Version: '1'
+          Configuration:
+            ActionMode: CREATE_UPDATE
+            Capabilities: CAPABILITY_IAM
+            RoleArn: !GetAtt 'CloudFormationRole.Arn'
+            StackName: !Sub '${EnviromentPrefix}-appsync'
+            TemplatePath: 'Backend::output.yaml'
+            ParameterOverrides: !Sub |
+              {
+                "EnviromentPrefix": "${EnviromentPrefix}"
+              }
+            OutputFileName: 'output.json'
+          InputArtifacts:
+          - Name: Backend
+          OutputArtifacts:
+          - Name: AppSync
+          RunOrder: 1
+        - Name: DeployFrontend
           ActionTypeId:
             Category: Deploy
             Owner: AWS

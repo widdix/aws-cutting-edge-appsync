@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS Cutting-Edge Architecture: AppSync + Lambda + DynamoDB'
+Description: 'AWS Cutting-Edge AppSync'
 Parameters:
   EnviromentPrefix:
     Type: String
