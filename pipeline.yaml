@@ -66,7 +66,7 @@ Resources:
           - 'sts:AssumeRole'
       ManagedPolicyArns:
       - 'arn:aws:iam::aws:policy/AdministratorAccess'
-  PackageCodeBuildRole:
+  PackageRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -107,8 +107,8 @@ Resources:
         CloudWatchLogs:
           Status: ENABLED
           GroupName: !Ref CodeBuildLogGroup
-          StreamName: 'cfn-package'
-      ServiceRole: !GetAtt 'PackageCodeBuildRole.Arn'
+          StreamName: 'package'
+      ServiceRole: !GetAtt 'PackageRole.Arn'
       Source:
         Type: CODEPIPELINE
         BuildSpec: !Sub |
@@ -125,7 +125,7 @@ Resources:
             files:
             - 'output.yaml'
       TimeoutInMinutes: 10
-  BuildFrontendCodeBuildRole:
+  BuildFrontendRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -167,10 +167,10 @@ Resources:
           Status: ENABLED
           GroupName: !Ref CodeBuildLogGroup
           StreamName: 'frontend-build'
-      ServiceRole: !GetAtt 'BuildFrontendCodeBuildRole.Arn'
+      ServiceRole: !GetAtt 'BuildFrontendRole.Arn'
       Source:
         Type: CODEPIPELINE
-        BuildSpec: !Sub |
+        BuildSpec: |
           version: 0.2
           phases:
             build:
@@ -178,7 +178,6 @@ Resources:
               - 'cd frontend'
               - 'npm install'
               - 'npm run-script build'
-              - 'ls'
           artifacts:
             files:
             - '**/*'
@@ -243,8 +242,7 @@ Resources:
                 "GithubOwner": "${GithubOwner}", 
                 "GithubRepo": "${GithubRepo}", 
                 "GithubOAuthToken": "${GithubOAuthToken}", 
-                "GithubSecret": "${GithubSecret}", 
-                "EnviromentPrefix": "${EnviromentPrefix}"
+                "GithubSecret": "${GithubSecret}"
               }
           InputArtifacts:
           - Name: Source
@@ -264,7 +262,7 @@ Resources:
           OutputArtifacts:
           - Name: Backend
           RunOrder: 1
-        - Name: PackageFrontend
+        - Name: BuildFrontend
           ActionTypeId:
             Category: Build
             Owner: AWS
@@ -289,11 +287,11 @@ Resources:
             ActionMode: CREATE_UPDATE
             Capabilities: CAPABILITY_IAM
             RoleArn: !GetAtt 'CloudFormationRole.Arn'
-            StackName: !Sub '${EnviromentPrefix}-appsync'
+            StackName: 'test-appsync'
             TemplatePath: 'Backend::output.yaml'
-            ParameterOverrides: !Sub |
+            ParameterOverrides: |
               {
-                "EnviromentPrefix": "${EnviromentPrefix}"
+                "EnviromentPrefix": "test"
               }
             OutputFileName: 'output.json'
           InputArtifacts:
