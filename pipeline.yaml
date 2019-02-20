@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS Cutting-Edge Architecture: Deployment Pipeline'
+Description: 'AWS Cutting-Edge AppSync: Deployment Pipeline'
 Parameters:
   GithubOwner:
     Type: String
