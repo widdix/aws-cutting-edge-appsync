@@ -12,9 +12,6 @@ Parameters:
   GithubSecret:
     Type: String
     NoEcho: true
-  EnviromentPrefix:
-    Type: String
-    Default: ''
 Resources:
   ArtifactStore:
     Type: 'AWS::S3::Bucket'
