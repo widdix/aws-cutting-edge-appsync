@@ -117,7 +117,7 @@ Resources:
               - 'pip install awscli==1.16.90'
             build:
               commands:
-              - 'aws cloudformation package --template-file appsync.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
+              - 'aws cloudformation package --template-file backend/appsync.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
           artifacts:
             files:
             - 'output.yaml'
