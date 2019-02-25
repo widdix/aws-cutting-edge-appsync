@@ -23,10 +23,10 @@ enum Service {
   apigateway
   eks
   ecs
-  rds-aurora
-  rds-postgres
-  rds-mysql
-  rds-mariadb
+  rds_aurora
+  rds_postgres
+  rds_mysql
+  rds_mariadb
   dynamodb
   s3
   efs
