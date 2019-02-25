@@ -86,7 +86,7 @@ var vote = new Vue({
         .mutate({
           mutation: gql`
             mutation {
-              vote(service: "${this.service}")
+              vote(service: ${this.service})
             }
           `
         })
