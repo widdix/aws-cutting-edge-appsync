@@ -4,7 +4,7 @@ type Query {
 }
 
 type Mutation {
-  vote(service: String!): Boolean
+  vote(service: Service!): Boolean
 }
 
 schema {
@@ -12,8 +12,29 @@ schema {
   mutation: Mutation
 }
 
+enum Service {
+  ec2
+  lambda
+  fargate
+  clb
+  nlb
+  alb
+  appsync
+  apigateway
+  eks
+  ecs
+  rds-aurora
+  rds-postgres
+  rds-mysql
+  rds-mariadb
+  dynamodb
+  s3
+  efs
+  ebs
+}
+
 type Services {
-  items: [String]
+  items: [Service]
   nextToken: String
 }
 
@@ -23,6 +44,6 @@ type VotingResults {
 }
 
 type VotingResult {
-  service: String!
+  service: Service!
   upvotes: Int!
 }
