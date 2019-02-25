@@ -1,6 +1,6 @@
 type Query {
   getVotingResults(nextToken: String): VotingResults
-   getServices(nextToken: String): Services
+  getServices(nextToken: String): Services
 }
 
 type Mutation {
