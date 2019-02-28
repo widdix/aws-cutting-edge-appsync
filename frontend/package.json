@@ -7,6 +7,7 @@
     "apollo-client": "^2.4.12",
     "apollo-link-context": "^1.0.14",
     "apollo-link-http": "^1.5.11",
+    "aws-appsync": "^1.7.1",
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "vue": "^2.6.2"

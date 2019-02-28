@@ -1,10 +1,11 @@
-import { ApolloClient } from 'apollo-client';
+import { AWSAppSyncClient } from 'aws-appsync'
 import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from "graphql-tag";
 import Vue from 'vue'
 
+const REGION = 'eu-west-1';
 const APPSYNC_URI = 'https://v233izxeofbg7mpx6pslew2wwm.appsync-api.eu-west-1.amazonaws.com/graphql';
 const APPSYNC_APIKEY = 'da2-7scjjscmlzcqtgkjm4kfv5czaa';
 
@@ -21,15 +22,35 @@ const authLink = setContext((_, { headers }) => {
   }
 });
 
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+const client = new AWSAppSyncClient({
+  url: APPSYNC_URI,
+  region: REGION,
+  auth: {
+    type: 'API_KEY',
+    apiKey: APPSYNC_APIKEY
+  }
+}, {
   defaultOptions: {
     query: {
       fetchPolicy: 'no-cache'
     }
   }
 });
+
+var observable = client.subscribe({
+    query: gql`
+        subscription {
+          voted
+        }
+      `
+  });
+
+console.log(observable);
+observable.subscribe(data => {
+  console.log("REFRESH");
+  votingresults.fetchData()}
+);
+
 
 var votingresults = new Vue({
   el: '#votingresults',
@@ -43,6 +64,7 @@ var votingresults = new Vue({
   },
   methods: {
     fetchData () {
+      console.log("REFRESH fetchData");
       client
         .query({
           query: gql`
@@ -92,13 +114,14 @@ var vote = new Vue({
         })
         .then(result => {
           console.log(result);
-          votingresults.fetchData();
+         // votingresults.fetchData();
         })
         .catch(err => {
           console.log(err);
         });
     },
     fetchData () {
+      console.log('fetchData()');
       client
         .query({
           query: gql`
