@@ -8,8 +8,8 @@ type Mutation {
 }
 
 type Subscription {
-  @aws_subscribe(mutations: ["vote"])
   voted: Boolean
+  @aws_subscribe(mutations: ["vote"])
 }
 
 schema {
