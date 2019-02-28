@@ -7,9 +7,15 @@ type Mutation {
   vote(service: Service!): Boolean
 }
 
+type Subscription {
+  @aws_subscribe(mutations: ["vote"])
+  voted: Boolean
+}
+
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 enum Service {
