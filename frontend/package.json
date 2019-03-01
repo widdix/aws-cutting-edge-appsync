@@ -1,7 +1,4 @@
 {
-  "name": "amplify-js-app",
-  "version": "1.0.0",
-  "description": "AWS Amplify JavaScript Example",
   "dependencies": {
     "apollo-cache-inmemory": "^1.4.2",
     "apollo-client": "^2.4.12",

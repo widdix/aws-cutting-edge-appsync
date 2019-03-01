@@ -55,6 +55,6 @@ type VotingResults {
 }
 
 type VotingResult {
-  service: Service!
+  service: ServiceType!
   upvotes: Int!
 }
