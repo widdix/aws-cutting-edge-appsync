@@ -37,17 +37,13 @@ const client = new AWSAppSyncClient({
   }
 });
 
-var observable = client.subscribe({
+client.subscribe({
     query: gql`
         subscription {
           voted
         }
       `
-  });
-
-console.log(observable);
-observable.subscribe(data => {
-  console.log("REFRESH");
+  }).subscribe(data => {
   votingresults.fetchData()}
 );
 
@@ -64,7 +60,6 @@ var votingresults = new Vue({
   },
   methods: {
     fetchData () {
-      console.log("REFRESH fetchData");
       client
         .query({
           query: gql`
