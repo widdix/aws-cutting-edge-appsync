@@ -127,7 +127,9 @@ var vote = new Vue({
           query: gql`
             {
               getServices(nextToken: null) {
-                items 
+                items {
+                  type
+                }
                 nextToken
               }
             }
