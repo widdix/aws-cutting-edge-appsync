@@ -1,19 +1,19 @@
 {
   "dependencies": {
-    "apollo-cache-inmemory": "1.6.2",
-    "apollo-client": "2.6.3",
-    "apollo-link-context": "1.0.18",
-    "apollo-link-http": "1.5.15",
+    "apollo-cache-inmemory": "1.6.3",
+    "apollo-client": "2.6.4",
+    "apollo-link-context": "1.0.19",
+    "apollo-link-http": "1.5.16",
     "aws-appsync": "1.8.1",
-    "graphql": "14.4.2",
+    "graphql": "14.5.8",
     "graphql-tag": "2.10.1",
     "vue": "2.6.10"
   },
   "devDependencies": {
-    "webpack": "4.17.1",
-    "webpack-cli": "3.1.0",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
     "copy-webpack-plugin": "4.5.2",
-    "webpack-dev-server": "3.1.5"
+    "webpack-dev-server": "3.9.0"
   },
   "scripts": {
     "start": "webpack && webpack-dev-server --mode development",

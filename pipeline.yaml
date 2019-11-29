@@ -43,10 +43,8 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            Service:
-            - 'cloudformation.amazonaws.com'
-          Action:
-          - 'sts:AssumeRole'
+            Service: 'cloudformation.amazonaws.com'
+          Action: 'sts:AssumeRole'
       ManagedPolicyArns:
       - 'arn:aws:iam::aws:policy/AdministratorAccess'
   PipelineRole:
@@ -57,10 +55,8 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            Service:
-            - 'codepipeline.amazonaws.com'
-          Action:
-          - 'sts:AssumeRole'
+            Service: 'codepipeline.amazonaws.com'
+          Action: 'sts:AssumeRole'
       ManagedPolicyArns:
       - 'arn:aws:iam::aws:policy/AdministratorAccess'
   PackageRole:
@@ -98,7 +94,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: 'BUILD_GENERAL1_SMALL'
-        Image: 'amazonlinux:2.0.20181114'
+        Image: 'aws/codebuild/standard:2.0'
         Type: 'LINUX_CONTAINER'
       LogsConfig:
         CloudWatchLogs:
@@ -112,9 +108,8 @@ Resources:
           version: 0.2
           phases:
             install:
-              commands:
-              - 'yum -y install python2-pip'
-              - 'pip install awscli==1.16.90'
+              runtime-versions:
+                nodejs: 10
             build:
               commands:
               - 'aws cloudformation package --template-file backend/appsync.yaml --s3-bucket ${ArtifactStore} --force-upload --output-template-file output.yaml'
@@ -157,7 +152,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: 'BUILD_GENERAL1_SMALL'
-        Image: 'aws/codebuild/nodejs:8.11.0'
+        Image: 'aws/codebuild/standard:2.0'
         Type: 'LINUX_CONTAINER'
       LogsConfig:
         CloudWatchLogs:
@@ -170,6 +165,9 @@ Resources:
         BuildSpec: |
           version: 0.2
           phases:
+            install:
+              runtime-versions:
+                nodejs: 10
             build:
               commands:
               - 'cd frontend'
