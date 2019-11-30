@@ -6,8 +6,8 @@ import gql from "graphql-tag";
 import Vue from 'vue'
 
 const REGION = 'eu-west-1';
-const APPSYNC_URI = 'https://v233izxeofbg7mpx6pslew2wwm.appsync-api.eu-west-1.amazonaws.com/graphql';
-const APPSYNC_APIKEY = 'da2-7scjjscmlzcqtgkjm4kfv5czaa';
+const APPSYNC_URI = 'https://4bjielknonghzg6fwnyycqtgnm.appsync-api.us-west-2.amazonaws.com/graphql';
+const APPSYNC_APIKEY = 'da2-abnudtp4kvgrzjcxchf6ezeovq';
 
 
 const httpLink = createHttpLink({
