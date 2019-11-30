@@ -282,11 +282,11 @@ Resources:
             ActionMode: CREATE_UPDATE
             Capabilities: CAPABILITY_IAM
             RoleArn: !GetAtt 'CloudFormationRole.Arn'
-            StackName: 'test-appsync'
+            StackName: 'prod-appsync'
             TemplatePath: 'Backend::output.yaml'
             ParameterOverrides: |
               {
-                "EnviromentPrefix": "test"
+                "EnviromentPrefix": "prod"
               }
             OutputFileName: 'output.json'
           InputArtifacts:
